@@ -26,19 +26,16 @@ func startRepl(cfg *config) {
 			continue
 		}
 
-		commandName := words[0]
+		cmdName := words[0]
+		args := words[1:]
 
-		command, exists := getCommands()[commandName]
-		if exists {
-			err := command.callback(cfg)
-			if err != nil {
-				fmt.Println(err)
+		if cmd, ok := getCommands()[cmdName]; ok {
+			if err := cmd.callback(cfg, args); err != nil {
+				fmt.Println("Error:", err)
 			}
 			continue
-		} else {
-			fmt.Println("Unknown command")
-			continue
 		}
+		fmt.Println("Unknown command")
 	}
 }
 
@@ -51,7 +48,7 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, []string) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -70,6 +67,11 @@ func getCommands() map[string]cliCommand {
 			name:        "mapb",
 			description: "Get the previous page of locations",
 			callback:    commandMapb,
+		},
+		"explore": {
+			name:        "explore",
+			description: "List of pokemons in the area",
+			callback:    commandExplore,
 		},
 		"exit": {
 			name:        "exit",
