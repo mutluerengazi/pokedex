@@ -12,6 +12,7 @@ func main() {
 			30*time.Second, // HTTP timeout
 			5*time.Second,  // cache expiry
 		),
+		pokedex: make(map[string]pokeapi.Pokemon),
 	}
 
 	startRepl(cfg)
