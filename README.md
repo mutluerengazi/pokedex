@@ -1,124 +1,149 @@
-# Pokedex CLI
+# Pokédex CLI
 
-A command-line interface Pokedex application that allows users to explore the world of Pokemon by accessing data from the [PokeAPI](https://pokeapi.co/).
+A fully-featured command-line Pokédex that lets you **explore the Pokémon world, catch Pokémon, inspect their stats, and list everything you’ve caught** – all from your terminal.
+Data comes live from the public [PokéAPI](https://pokeapi.co/), with an in-memory cache so repeated queries are instant.
 
-## Features
+---
 
-- Interactive command-line interface with a REPL (Read-Eval-Print Loop)
-- Browse through different Pokemon locations
-- Paginated navigation through location areas
-- Simple and intuitive command system
+## ✨ Feature Overview
 
-## Installation
+| Category         | What you can do                                                                                 |
+| ---------------- | ----------------------------------------------------------------------------------------------- |
+| **World map**    | Step through *location-areas* page-by-page (`map`, `mapb`).                                     |
+| **Exploration**  | `explore <area>` – list every wild Pokémon that appears in that area.                           |
+| **Catching**     | `catch <pokemon>` – throw a Pokéball; difficulty scales with the Pokémon’s base-experience.     |
+| **Inspection**   | `inspect <pokemon>` – see height, weight, full stat block and types (only after you catch it!). |
+| **Your Pokédex** | `pokedex` – alphabetic list of everything you’ve caught so far.                                 |
+| **Help / Quit**  | `help`, `exit`.                                                                                 |
+| **Performance**  | Transparent 5-second cache layer for all API calls.                                             |
+| **Tests**        | Unit tests for cache logic and more (`go test ./...`).                                          |
+
+---
+
+## 🚀 Installation
 
 ### Prerequisites
 
-- Go 1.18 or higher
+* Go 1.20 or newer (the program relies on the new default seeding behaviour of `math/rand`).
 
 ### Steps
 
-1. Clone the repository:
-   ```
-   git clone https://github.com/mutluerengazi/pokedex.git
-   ```
+```bash
+git clone https://github.com/mutluerengazi/pokedex.git
+cd pokedex
+go build          # produces ./pokedex
+./pokedex
+```
 
-2. Navigate to the project directory:
-   ```
-   cd pokedex
-   ```
+---
 
-3. Build the application:
-   ```
-   go build
-   ```
+## 🕹️ Usage
 
-4. Run the application:
-   ```
-   ./pokedex
-   ```
-
-## Usage
-
-Once you start the application, you'll be presented with a prompt:
+When you start the binary you’ll see the prompt:
 
 ```
 Pokedex >
 ```
 
-### Available Commands
+### Command reference
 
-| Command | Description |
-|---------|-------------|
-| `help`  | Displays a help message with all available commands |
-| `map`   | Get the next page of Pokemon locations |
-| `mapb`  | Get the previous page of Pokemon locations |
-| `exit`  | Exit the Pokedex application |
+| Command   | Arguments         | Description                              |
+| --------- | ----------------- | ---------------------------------------- |
+| `help`    | –                 | Show every command.                      |
+| `map`     | –                 | Next page of location-areas.             |
+| `mapb`    | –                 | Previous page of location-areas.         |
+| `explore` | `<location-area>` | List wild Pokémon in that area.          |
+| `catch`   | `<pokemon>`       | Attempt to catch a Pokémon.              |
+| `inspect` | `<pokemon>`       | Show stats of a Pokémon you have caught. |
+| `pokedex` | –                 | List all caught Pokémon.                 |
+| `exit`    | –                 | Quit the application.                    |
 
-### Examples
+### Quick demo
 
-View available commands:
-```
-Pokedex > help
-
-Welcome to the Pokedex!
-Usage:
-
-help: Displays a help message
-map: Get the next page of locations
-mapb: Get the previous page of locations
-exit: Exit the Pokedex
-```
-
-Browse locations:
-```
+```text
 Pokedex > map
-canalave-city
-eterna-city
-pastoria-city
-sunyshore-city
-sinnoh-pokemon-league
-...
+pastoria-city-area
+route-212-south
+great-marsh-area-1
+…
+
+Pokedex > explore pastoria-city-area
+Exploring pastoria-city-area...
+Found Pokémon:
+ - tentacool
+ - remoraid
+ - shellder
+ - …
+
+Pokedex > catch shellder
+Throwing a Pokéball at shellder...
+shellder was caught!
+You may now inspect it with the inspect command.
+
+Pokedex > inspect shellder
+Name: shellder
+Height: 3
+Weight: 40
+Stats:
+  -hp: 30
+  -attack: 65
+  -defense: 100
+  -special-attack: 45
+  -special-defense: 25
+  -speed: 40
+Types:
+  - water
+
+Pokedex > pokedex
+Your Pokedex:
+ - shellder
 ```
 
-Navigate to previous locations:
+---
+
+## 🗂 Project Structure
+
 ```
-Pokedex > mapb
+.
+├── cmd/ (optional)        # main.go entry if you use a cmd folder
+├── repl.go                # REPL loop & command dispatch
+├── command_<x>.go         # one file per CLI command
+├── internal/
+│   ├── pokeapi/           # thin, cache-aware HTTP client
+│   │   ├── client.go
+│   │   ├── pokemon.go
+│   │   ├── location.go
+│   │   └── …
+│   └── pokecache/         # thread-safe TTL cache (map+mutex+ticker)
+└── README.md
 ```
 
-Exit the application:
-```
-Pokedex > exit
-Closing the Pokedex... Goodbye!
-```
+---
 
-## Project Structure
-
-- `main.go` - Entry point for the application
-- `repl.go` - REPL implementation for command-line interface
-- `config.go` - Configuration for API URLs
-- Command files:
-  - `command_help.go` - Implementation of the help command
-  - `command_map.go` - Implementation of map and mapb commands
-  - `command_exit.go` - Implementation of the exit command
-- `internal/pokeapi/` - Client implementation for interfacing with the PokeAPI
-
-## Technologies
-
-- Go programming language
-- [PokeAPI](https://pokeapi.co/) - RESTful Pokemon data API
-
-## Testing
-
-Run the tests with:
+## 🧪 Testing
 
 ```
 go test ./...
 ```
 
-## License
+The test suite covers cache insertion, lookup and automatic reaping.
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+---
 
-## Acknowledgements
+## 🔧 Tech Stack
 
-- [PokeAPI](https://pokeapi.co/) for providing the Pokemon data
+* **Go** – standard library only (HTTP, JSON, sync, time, math/rand).
+* **PokéAPI** – community-maintained REST API for Pokémon data.
+
+---
+
+## 📄 License
+
+MIT – see `LICENSE`.
+
+---
+
+## 🙏 Acknowledgements
+
+* Thanks to [PokéAPI](https://pokeapi.co/) for the fantastic public dataset.
+
