@@ -137,12 +137,6 @@ The test suite covers cache insertion, lookup and automatic reaping.
 
 ---
 
-## 📄 License
-
-MIT – see `LICENSE`.
-
----
-
 ## 🙏 Acknowledgements
 
 * Thanks to [PokéAPI](https://pokeapi.co/) for the fantastic public dataset.
